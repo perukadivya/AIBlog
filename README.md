@@ -1,36 +1,189 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Blog Generator 🚀
 
-## Getting Started
+An open-source, AI-powered personal website & blog platform. Push your markdown drafts and let AI generate polished, publication-ready blog posts automatically.
 
-First, run the development server:
+**[Live Demo](https://your-site.vercel.app)** · **[Deploy Your Own](#-quick-start)**
+
+---
+
+## ✨ Features
+
+- 🎨 **Beautiful UI** — Modern design with shadcn/ui, dark/light mode, glassmorphism effects
+- 🤖 **AI Blog Generation** — Push `.md` drafts → AI generates polished blog posts automatically
+- 🔄 **Dual AI Support** — Works with both **Google Gemini** (free tier) and **Anthropic Claude**
+- 📝 **Rich Markdown** — Syntax highlighting, embedded videos, tables, images
+- ⚡ **One-Click Deploy** — Fork, configure, deploy to Vercel in minutes
+- 📱 **Fully Responsive** — Looks great on desktop, tablet, and mobile
+- 🔍 **SEO Optimized** — Meta tags, Open Graph, structured data
+- 📄 **Resume Page** — Timeline-style resume pulled from config
+- 💼 **Projects Page** — Showcase your work with filterable project cards
+
+## 🏗️ Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **AI**: Google Gemini / Anthropic Claude
+- **CI/CD**: GitHub Actions
+- **Hosting**: Vercel
+- **Content**: Markdown with gray-matter
+
+## 🚀 Quick Start
+
+### 1. Fork & Clone
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Fork this repo on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/ai-blog.git
+cd ai-blog
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Your Site
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Edit `site.config.ts` with your details:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```typescript
+export const siteConfig = {
+  name: "Your Name",
+  profession: "Your Profession",
+  tagline: "Your tagline",
+  social: {
+    github: "https://github.com/yourusername",
+    twitter: "https://x.com/yourusername",
+    linkedin: "https://linkedin.com/in/yourusername",
+    email: "you@example.com",
+  },
+  // ... projects, resume, etc.
+};
+```
 
-## Learn More
+### 3. Set Up AI (GitHub Secrets)
 
-To learn more about Next.js, take a look at the following resources:
+Go to your repo → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Secret Name | Description |
+|---|---|
+| `GEMINI_API_KEY` | Get from [Google AI Studio](https://aistudio.google.com/apikey) (free) |
+| `CLAUDE_API_KEY` | Get from [Anthropic Console](https://console.anthropic.com/) (paid) |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Also set the **Variable** (under Variables tab):
+| Variable Name | Value |
+|---|---|
+| `AI_PROVIDER` | `gemini` or `claude` |
 
-## Deploy on Vercel
+### 4. Deploy to Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/ai-blog)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or manually:
+```bash
+npm i -g vercel
+vercel
+```
+
+### 5. Start Blogging!
+
+```bash
+# Create a draft
+echo "# My First Analysis\n\nKey findings: ..." > blog_drafts/my-analysis.md
+
+# Push it
+git add blog_drafts/my-analysis.md
+git commit -m "New draft: my analysis"
+git push
+```
+
+The GitHub Action will:
+1. ✅ Detect the new draft
+2. 🤖 Generate a polished blog post using AI
+3. 📝 Save it to `content/blog/`
+4. 🚀 Auto-trigger Vercel rebuild
+
+## 📁 Project Structure
+
+```
+ai-blog/
+├── .github/
+│   └── workflows/
+│       └── generate-blog.yml    # GitHub Action for AI blog generation
+├── blog_drafts/                 # 📝 Put your drafts here!
+│   └── sample-draft.md
+├── content/
+│   └── blog/                    # 📄 Generated blog posts (auto-generated)
+│       └── getting-started.md
+├── public/
+│   └── images/                  # 🖼️ Images (blog covers, avatar)
+├── scripts/
+│   └── generate-blog.mjs       # 🤖 AI generation script
+├── src/
+│   ├── app/                     # 📱 Next.js pages
+│   │   ├── page.tsx             # Home
+│   │   ├── blog/                # Blog listing & posts
+│   │   ├── projects/            # Projects showcase
+│   │   └── resume/              # Resume/CV
+│   ├── components/              # 🧩 Reusable components
+│   └── lib/                     # 🔧 Utilities
+├── site.config.ts               # ⚙️ Your site configuration
+└── package.json
+```
+
+## 📝 Writing Drafts
+
+Your draft can be rough notes, data analysis, or structured content:
+
+```markdown
+# My Research on AI Trends
+
+## Key Findings
+- LLM costs dropped 90%
+- Open-source models catching up
+
+## Data
+| Metric | 2023 | 2024 |
+|--------|------|------|
+| Cost/1M tokens | $30 | $3 |
+| Open-source accuracy | 70% | 92% |
+
+## My Analysis
+I believe the trend indicates...
+```
+
+### Including Media
+
+- **Images**: Place `.png/.jpg/.webp` files in `blog_drafts/` alongside your markdown
+- **Videos**: Paste YouTube URLs on their own line — they auto-embed
+- **Charts**: Include as images or describe the data for AI to reference
+
+## 🎨 Customization
+
+### Theming
+Edit CSS variables in `src/app/globals.css`:
+```css
+:root {
+  --primary: 262 83% 58%;        /* Purple accent */
+  --gradient-start: 262 83% 58%; /* Gradient from */
+  --gradient-end: 330 81% 60%;   /* Gradient to */
+}
+```
+
+### Adding Pages
+Create new files in `src/app/` — Next.js App Router handles routing automatically.
+
+### Changing AI Behavior
+Edit the prompts in `scripts/generate-blog.mjs` to customize the AI's writing style, tone, or structure.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- 🐛 Report bugs
+- ✨ Suggest features
+- 📝 Improve documentation
+- 🔧 Submit PRs
+
+## 📄 License
+
+MIT License — use it freely for personal or commercial projects.
+
+---
+
+Built with ❤️ and AI. Star ⭐ this repo if you find it useful!

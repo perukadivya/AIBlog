@@ -1,0 +1,78 @@
+name: Generate AI Blog Post
+
+on:
+  push:
+    paths:
+      - 'blog_drafts/**'
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  generate-blog:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Detect new/modified drafts
+        id: detect
+        run: |
+          # Get changed files in blog_drafts/
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'blog_drafts/' | grep -E '\.(md|txt)$' || true)
+          echo "files=$CHANGED_FILES" >> $GITHUB_OUTPUT
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No new drafts found"
+            echo "has_drafts=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found drafts: $CHANGED_FILES"
+            echo "has_drafts=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate blog posts
+        if: steps.detect.outputs.has_drafts == 'true'
+        env:
+          AI_PROVIDER: ${{ vars.AI_PROVIDER || 'gemini' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: |
+          IFS=$'\n'
+          for file in ${{ steps.detect.outputs.files }}; do
+            echo "Processing: $file"
+            node scripts/generate-blog.mjs "$file"
+          done
+
+      - name: Copy draft images to public
+        if: steps.detect.outputs.has_drafts == 'true'
+        run: |
+          mkdir -p public/images/blog
+          # Copy any images from blog_drafts to public/images/blog
+          find blog_drafts/ -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.gif" -o -name "*.webp" -o -name "*.svg" \) -exec cp {} public/images/blog/ \; 2>/dev/null || true
+
+      - name: Commit and push generated blog
+        if: steps.detect.outputs.has_drafts == 'true'
+        run: |
+          git config user.name "AI Blog Generator"
+          git config user.email "ai-blog-bot@users.noreply.github.com"
+          git add content/blog/ public/images/blog/
+          
+          if git diff --staged --quiet; then
+            echo "No new blog posts generated"
+          else
+            git commit -m "🤖 Auto-generated blog post from draft"
+            git push
+          fi
